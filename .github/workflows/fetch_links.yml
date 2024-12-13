@@ -1,0 +1,35 @@
+name: Fetch V2Ray Links
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # 每12小时运行一次
+  workflow_dispatch: # 手动触发工作流
+
+jobs:
+  fetch-links:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run fetch_links.py
+        run: python fetch_links.py
+
+      - name: Commit and push updated links
+        run: |
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "<>"
+          git add links.txt
+          git commit -m "Update links.txt"
+          git push
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
