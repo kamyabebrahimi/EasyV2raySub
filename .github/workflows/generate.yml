@@ -24,7 +24,15 @@ jobs:
       - name: Run generate.py
         run: python generate.py
 
+      - name: Check if file has changed
+        run: |
+          if git diff --exit-code links.txt > /dev/null; then
+            echo "No changes detected in links.txt. Skipping commit and push."
+            exit 0
+          fi
+
       - name: Commit and push updated links
+        if: success()
         run: |
           git config --local user.name "GitHub Actions Bot"
           git config --local user.email "<>"
