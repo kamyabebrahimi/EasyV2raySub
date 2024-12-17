@@ -5,38 +5,52 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+default_regex = r'(?<=\s)(v[ml]e)?ss://\S+(?=\s)'
+request_headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
+}
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', '--url', required=True, help='a website containing vmess or vless links text.')
-    parser.add_argument('-ar', '--additional-regex', required=False, help='add more regex to match links.')
+    parser.add_argument('-u', '--urls',
+                        required=True,
+                        nargs='+',
+                        help='One or more websites that contain links with the protocol prefixes "vmess://", '
+                             '"vless://", and "ss://".')
+    parser.add_argument('-ar', '--additional-regex',
+                        required=False,
+                        help='Add more regex patterns to match links (optional).')
     return parser.parse_args()
 
 
-def get_links(args):
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
-        }
-        response = requests.get(args.url, headers=headers)
-        response.raise_for_status()
-        html_content = response.text
+def match_links(regex, text):
+    results = []
+    matches = re.finditer(regex, text)
+    for match in matches:
+        if match:
+            results.append(match.group())
+    return results
 
-        soup = BeautifulSoup(html_content, 'html.parser')
-        page_text = soup.get_text()
 
-        vmess_links = re.findall(r'vmess://[^\s]+', page_text)
-        vless_links = re.findall(r'vless://[^\s]+', page_text)
-        additional_links = re.findall(f'{args.additional_regex}', page_text)
+def get_links(urls, additional_regex):
+    all_links = []
+    for url in urls:
+        try:
+            response = requests.get(url, headers=request_headers)
+            response.raise_for_status()
+            html_content = response.text
 
-        all_links = []
-        all_links.extend(vmess_links)
-        all_links.extend(vless_links)
-        all_links.extend(additional_links)
-        return all_links
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching the URL: {e}")
-        return []
+            soup = BeautifulSoup(html_content, 'html.parser')
+            page_text = soup.get_text()
+
+            all_links.extend(match_links(default_regex, page_text))
+            if additional_regex:
+                all_links.extend(match_links(additional_regex, page_text))
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching the URL: {e}")
+    return all_links
 
 
 def write_links_to_file(links, file_path):
@@ -49,5 +63,5 @@ def write_links_to_file(links, file_path):
 
 if __name__ == "__main__":
     args = parse_args()
-    links = get_links(args)
+    links = get_links(args.urls, args.additional_regex)
     write_links_to_file(links, 'links.txt')
