@@ -1,3 +1,5 @@
+English | [简体中文](README_CN.md)
+
 # EasyV2RaySub
 
 Easy way to generate your own V2Ray subscription link.
@@ -17,7 +19,7 @@ This project can help you generate a subscription link to get rid of this proble
 ### 2. Edit the workflow configuration
 
 The workflow configuration file is `.github/workflows/generate.yml`.\
-Replace `YOUR_URL_HERE` with your desired URL:
+Replace `YOUR_URL_HERE` with your desired URL, which is the website that contains free V2Ray server links:
 
 ```yaml
 - name: Run generate.py
@@ -28,13 +30,13 @@ Replace `YOUR_URL_HERE` with your desired URL:
 
 Check the workflow job status and details in your project's `Actions` section. You can also manually trigger the job
 here.\
-By default, it runs automatically every 12 hours. To change the frequency, edit the `cron` schedule in the configuration
+By default, it runs automatically every 2 hours. To change the frequency, edit the `cron` schedule in the configuration
 file:
 
 ```yaml
 on:
   schedule:
-    - cron: '0 */12 * * *' # For example, changing 12 to 2 means running the workflow job every 2 hours.
+    - cron: '0 */2 * * *' # For example, changing 2 to 12 means running the workflow job every 12 hours.
 ```
 
 The schedule uses cron syntax, see [cron expression](https://en.wikipedia.org/wiki/Cron#Cron_expression) for details.
@@ -79,8 +81,8 @@ link**.
 
 # How it works?
 
-This project uses simple regex (you can also add your own) to match links with the protocol prefixes `vmess://`
-and `vless://` from a specific website.
+This project uses simple regex (you can also add your own) to match links with the protocol
+prefixes `vmess://`, `vless://` and `ss://` from a specific website.
 
 Once the links are extracted, they are written into the `links.txt` file in the format specified
 by [2dust/v2rayN](https://github.com/2dust/v2rayN/wiki/%E8%AE%A2%E9%98%85%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E), which
@@ -88,4 +90,4 @@ states:
 
 - All links are joined into a string with delimiter `\n`, then encoded into `Base64`.
 
- The URL of the `links.txt` file can then be used as a **subscription link** for V2Ray clients.
+The URL of the `links.txt` file can then be used as a **subscription link** for V2Ray clients.
