@@ -23,12 +23,11 @@ jobs:
 
       - name: Generate URL
         run: |
-          from datetime import datetime
-          year = datetime.now().year
-          month = datetime.now().strftime("%m")
-          day = datetime.now().strftime("%d")
-          url = f"https://clashnode.cc/uploads/{year}/{month}/0-{year}{month}{day}.txt"
-          echo "URL=$url" >> $GITHUB_ENV
+          YEAR=$(date +%Y)
+          MONTH=$(date +%m)
+          DAY=$(date +%d)
+          U="https://clashnode.cc/uploads/${YEAR}/${MONTH}/0-${YEAR}${MONTH}${DAY}.txt"
+          echo "URL=$U" >> $GITHUB_ENV
 
       - name: Run generate.py
         run: python generate.py --url $URL -o links2.txt
