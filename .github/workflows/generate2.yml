@@ -1,0 +1,56 @@
+name: Generate V2Ray Links 2
+
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Every 2 hours
+  workflow_dispatch:
+
+jobs:
+  generate-links:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests>=2.32.3 beautifulsoup4>=4.12.3
+
+      - name: Generate URL
+        run: |
+          from datetime import datetime
+          year = datetime.now().year
+          month = datetime.now().strftime("%m")
+          day = datetime.now().strftime("%d")
+          url = f"https://clashnode.cc/uploads/{year}/{month}/0-{year}{month}{day}.txt"
+          echo "URL=$url" >> $GITHUB_ENV
+
+      - name: Run generate.py
+        run: python generate.py --url $URL -o links2.txt
+
+      - name: Check for file changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes detected."
+            echo "has_changes=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected."
+            echo "has_changes=true" >> $GITHUB_ENV
+          fi
+
+      - name: Commit and push updated links
+        if: env.has_changes == 'true'
+        run: |
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "<>"
+          git add links2.txt
+          git commit -m "Update links2.txt"
+          git push
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}

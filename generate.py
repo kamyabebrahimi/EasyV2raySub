@@ -21,6 +21,10 @@ def parse_args():
     parser.add_argument('-ar', '--additional-regex',
                         required=False,
                         help='Add more regex patterns to match links (optional).')
+    parser.add_argument('-o', '--output-file',
+                        required=False,
+                        default='links.txt',
+                        help='Specify a file to write the output to.')
     return parser.parse_args()
 
 
@@ -64,4 +68,4 @@ def write_links_to_file(links, file_path):
 if __name__ == "__main__":
     args = parse_args()
     links = get_links(args.urls, args.additional_regex)
-    write_links_to_file(links, 'links.txt')
+    write_links_to_file(links, args.output_file)
