@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 default_regex = r'(?<=\s)(v[ml]e)?ss://\S+(?=\s)'
+domain_regex = r'([a-zA-Z\d][a-zA-Z\d\-]{1,62}\.){1,3}[a-zA-Z]{2,63}'
 request_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
 }
@@ -57,7 +58,18 @@ def get_links(urls, additional_regex):
     return all_links
 
 
+# Change the name after the '#' character at the end of the link
+def change_node_name(links):
+    new_links = []
+    for link in links:
+        link_parts = link.split('#')
+        new_name = re.sub(domain_regex, "EasyV2raySub", link_parts[1])
+        new_links.append(link_parts[0] + '#' + new_name)
+    return new_links
+
+
 def write_links_to_file(links, file_path):
+    links = change_node_name(links)
     links_str = "\n".join(links)
     links_base64 = base64.b64encode(links_str.encode('utf-8'))
 
