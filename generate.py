@@ -63,6 +63,9 @@ def change_node_name(links):
     new_links = []
     for link in links:
         link_parts = link.split('#')
+        if len(link_parts) != 2:
+            new_links.append(link)
+            continue
         new_name = re.sub(domain_regex, "EasyV2raySub", link_parts[1])
         new_links.append(link_parts[0] + '#' + new_name)
     return new_links
