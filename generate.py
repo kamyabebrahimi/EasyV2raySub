@@ -1,5 +1,6 @@
 import argparse
 import base64
+import json
 import re
 
 import requests
@@ -62,12 +63,20 @@ def get_links(urls, additional_regex):
 def change_node_name(links):
     new_links = []
     for link in links:
-        link_parts = link.split('#')
-        if len(link_parts) != 2:
+        try:
+            link_parts = link.split('#')
+            if len(link_parts) == 2:
+                new_name = re.sub(domain_regex, "EasyV2raySub", link_parts[1])
+                new_links.append(link_parts[0] + '#' + new_name)
+            else:
+                link_parts = link.split("://")
+                link = base64.b64decode(link_parts[1].encode('ascii')).decode('utf-8')
+                json_dict = json.loads(link)
+                json_dict['ps'] = re.sub(domain_regex, "EasyV2raySub", json_dict['ps'])
+                encode_link = base64.b64encode(bytes(json.dumps(json_dict), 'utf-8')).decode('utf-8')
+                new_links.append(link_parts[0] + '://' + encode_link)
+        except:
             new_links.append(link)
-            continue
-        new_name = re.sub(domain_regex, "EasyV2raySub", link_parts[1])
-        new_links.append(link_parts[0] + '#' + new_name)
     return new_links
 
 
