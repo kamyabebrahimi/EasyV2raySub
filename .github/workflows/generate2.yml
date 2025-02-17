@@ -26,8 +26,11 @@ jobs:
           YEAR=$(date +%Y)
           MONTH=$(date +%m)
           DAY=$(date +%d)
-          U="https://clashnode.cc/uploads/${YEAR}/${MONTH}/0-${YEAR}${MONTH}${DAY}.txt"
-          echo "URL=$U" >> $GITHUB_ENV
+          U0="https://node.clashnode.cc/uploads/${YEAR}/${MONTH}/0-${YEAR}${MONTH}${DAY}.txt"
+          U1="https://node.clashnode.cc/uploads/${YEAR}/${MONTH}/1-${YEAR}${MONTH}${DAY}.txt"
+          U2="https://node.clashnode.cc/uploads/${YEAR}/${MONTH}/2-${YEAR}${MONTH}${DAY}.txt"
+          U3="https://node.clashnode.cc/uploads/${YEAR}/${MONTH}/3-${YEAR}${MONTH}${DAY}.txt"
+          echo "URL=$U0 $U1 $U2 $U3" >> $GITHUB_ENV
 
       - name: Run generate.py
         run: python generate.py --url $URL -o links2.txt
